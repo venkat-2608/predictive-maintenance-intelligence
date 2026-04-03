@@ -15,3 +15,21 @@ The goal of this system is to analyze these signals and detect early warning sig
 - Model training
 - Model evaluation
 - Failure prediction engine
+
+Predictive Maintenance Intelligence System
+
+The system predicts machine failure based on sensor telemetry data.
+
+Pipeline:
+
+Sensor Data
+    ↓
+Feature Engineering
+    ↓
+Machine Learning Model (Random Forest)
+    ↓
+Prediction Engine
+    ↓
+FastAPI API
+    ↓
+User Input → Failure Prediction
