@@ -1,13 +1,15 @@
 import pandas as pd
 import joblib
 
-# load trained model
+# load trained model once
 model = joblib.load("models/failure_prediction_model.pkl")
 
 
-def predict_failure(data):
+def preprocess_input(data: dict) -> pd.DataFrame:
+    """
+    Convert raw API input into model-ready DataFrame
+    """
 
-    # convert API input into dataframe
     df = pd.DataFrame([{
         "Air temperature [K]": data["Air_temperature"],
         "Process temperature [K]": data["Process_temperature"],
@@ -16,12 +18,23 @@ def predict_failure(data):
         "Tool wear [min]": data["Tool_wear"]
     }])
 
-    # encode machine type
-    df["Type_L"] = 1 if data["Type"] == "L" else 0
-    df["Type_M"] = 1 if data["Type"] == "M" else 0
-    df["Type_H"] = 1 if data["Type"] == "H" else 0
+    # encode machine type safely
+    machine_type = data.get("Type", "").upper()
 
-    # prediction
+    df["Type_L"] = 1 if machine_type == "L" else 0
+    df["Type_M"] = 1 if machine_type == "M" else 0
+    df["Type_H"] = 1 if machine_type == "H" else 0
+
+    return df
+
+
+def predict_failure(data: dict) -> int:
+    """
+    Run prediction on processed input
+    """
+
+    df = preprocess_input(data)
+
     prediction = model.predict(df)[0]
 
     return int(prediction)
