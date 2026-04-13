@@ -35,6 +35,10 @@ def predict_failure(data: dict) -> int:
 
     df = preprocess_input(data)
 
+    logger.info(f"Input data processed: {df.to_dict(orient='records')}")
+
     prediction = model.predict(df)[0]
+
+    logger.info(f"Prediction result: {prediction}")
 
     return int(prediction)
