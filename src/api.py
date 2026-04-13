@@ -1,5 +1,5 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel, Field
 
 from src.prediction_engine import predict_failure
 
@@ -7,13 +7,12 @@ app = FastAPI()
 
 
 class MachineData(BaseModel):
-
-    Type: str
-    Air_temperature: float
-    Process_temperature: float
-    Rotational_speed: float
-    Torque: float
-    Tool_wear: float
+    Type: str = Field(..., example="M")
+    Air_temperature: float = Field(..., gt=0)
+    Process_temperature: float = Field(..., gt=0)
+    Rotational_speed: float = Field(..., gt=0)
+    Torque: float = Field(..., gt=0)
+    Tool_wear: float = Field(..., ge=0)
 
 
 @app.get("/")
@@ -23,12 +22,15 @@ def root():
 
 @app.post("/predict")
 def predict(input_data: MachineData):
+    try:
+        data = input_data.dict()
 
-    # convert pydantic model → dictionary
-    data = input_data.dict()
+        result = predict_failure(data)
 
-    result = predict_failure(data)
+        return {
+            "prediction": int(result),
+            "status": "failure" if result == 1 else "normal"
+        }
 
-    return {
-        "prediction": result
-    }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
