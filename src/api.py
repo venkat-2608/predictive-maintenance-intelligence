@@ -3,7 +3,11 @@ from pydantic import BaseModel, Field
 
 from src.prediction_engine import predict_failure
 
-app = FastAPI()
+app = FastAPI(
+    title="Predictive Maintenance API",
+    description="API for predicting machine failure based on sensor data",
+    version="1.0.0"
+)
 
 
 class MachineData(BaseModel):
@@ -15,12 +19,12 @@ class MachineData(BaseModel):
     Tool_wear: float = Field(..., ge=0)
 
 
-@app.get("/")
+@app.get("/", tags=["Health"])
 def root():
     return {"message": "Predictive Maintenance API running"}
 
 
-@app.post("/predict")
+@app.post("/predict", tags=["Prediction"])
 def predict(input_data: MachineData):
     try:
         data = input_data.dict()
