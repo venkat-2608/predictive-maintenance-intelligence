@@ -19,12 +19,17 @@ class MachineData(BaseModel):
     Tool_wear: float = Field(..., ge=0)
 
 
+class PredictionResponse(BaseModel):
+    prediction: int
+    status: str
+
+
 @app.get("/", tags=["Health"])
 def root():
     return {"message": "Predictive Maintenance API running"}
 
 
-@app.post("/predict", tags=["Prediction"])
+@app.post("/predict", response_model=PredictionResponse, tags=["Prediction"])
 def predict(input_data: MachineData):
     try:
         data = input_data.dict()
